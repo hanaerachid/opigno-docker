@@ -2,17 +2,24 @@ FROM php:8.0.23-apache
 
 RUN a2enmod rewrite
 
-RUN apt-get update && apt-get -y install git mysql-client vim-tiny wget httpie unzip
+RUN apt update && apt -y install git default-mysql-client vim-tiny wget httpie unzip apt-utils
 
 # Suppressing menu to choose keyboard layout
 # COPY ./keyboard /etc/default/keyboard
 
+# SET TZ
+RUN apt-get install -y tzdata
+RUN echo 'Asia/Kolkata' > /etc/timezone
+RUN dpkg-reconfigure --frontend noninteractive tzdata
+
 # install the PHP extensions we need
-RUN apt-get install -y libpng-dev libjpeg-dev libpq-dev zlib1g-dev \
-#	&& apt-get install -y wkhtmltopdf openssl build-essential xorg libssl-dev \ # to install wkhtmltopdf we need to suppress menu to choose keyboard layout
+RUN apt install -y libpq-dev zlib1g-dev libpng-dev libjpeg-dev libwebp-dev libfreetype6-dev libonig-dev libzip-dev \
+	&& apt install -y openssl build-essential xorg libssl-dev \
+	# to install wkhtmltopdf we need to suppress menu to choose keyboard layout
+	&& apt install -y wkhtmltopdf \
 	&& rm -rf /var/lib/apt/lists/* \
-	&& docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-	&&  docker-php-ext-install gd mbstring pdo pdo_mysql pdo_pgsql zip
+	&& docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype \
+	&& docker-php-ext-install gd pdo pdo_mysql pdo_pgsql zip
 
 # Install Composer.
 RUN curl -sS https://getcomposer.org/installer | php
@@ -23,11 +30,12 @@ RUN composer global require drush/drush
 RUN composer global update
 RUN ln -s /root/.composer/vendor/bin/drush /usr/local/bin/drush
 
-# Add drush comand https://www.drupal.org/project/registry_rebuild
+# Add drush command https://www.drupal.org/project/registry_rebuild
 RUN wget http://ftp.drupal.org/files/projects/registry_rebuild-7.x-2.5.tar.gz && \
-    tar xzf registry_rebuild-7.x-2.5.tar.gz && \
-    rm registry_rebuild-7.x-2.5.tar.gz && \
-    mv registry_rebuild /root/.composer/vendor/drush/drush/commands
+	tar xzf registry_rebuild-7.x-2.5.tar.gz && \
+	rm registry_rebuild-7.x-2.5.tar.gz && \
+	mkdir -p /root/.composer/vendor/drush/drush/commands \
+	mv registry_rebuild /root/.composer/vendor/drush/drush/commands
 
 WORKDIR /var/www/html
 

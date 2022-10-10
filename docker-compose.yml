@@ -10,21 +10,40 @@
 # Database password: example
 # ADVANCED OPTIONS; Database host: postgres
 
-version: '2'
+version: '3.3'
 
 services:
-
   opigno:
+    container_name: opigno
+    hostname: opigno
     build: .
     ports:
       - 8080:80
     restart: always
+    networks:
+      - web
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - traefik.http.routers.opigno.entrypoints=web
+      - 'traefik.http.routers.opigno.rule=Host(`opigno.kdock.cloud`)'
+      - traefik.http.services.opigno.loadbalancer.server.port=8080
 
   mariadb:
-    image: mariadb:10.1
+    container_name: mariadb
+    image: mariadb:10.11.0
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: opigno
     volumes:
       - ./mariadb-data:/var/lib/mysql
     restart: always
+    networks:
+      - web
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - traefik.http.routers.mariadb.entrypoints=web
+networks:
+  web:
+    external: true
