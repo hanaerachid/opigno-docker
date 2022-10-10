@@ -1,4 +1,5 @@
-# Basic Docker distribution Opigno 1.25
+# Basic Docker distribution Opigno 3.0.4
+### Credit to [Vabue](https://github.com/vabue/opigno-docker)
 
 Simpliest method to try is to use 
 
@@ -13,4 +14,3 @@ Then during configuration use:
 * dabatase user `root`;
 * database password `rootpassword`;
 * database host `mariadb`.
-
