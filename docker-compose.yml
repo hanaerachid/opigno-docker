@@ -18,8 +18,10 @@ services:
     hostname: opigno
     build: .
     ports:
-      - 8080:80
+      - 10000:80
     restart: always
+    # volumes:
+    #   - $PWD/sites:/var/www/html/sites
     networks:
       - web
     labels:
@@ -27,23 +29,23 @@ services:
       - traefik.docker.network=web
       - traefik.http.routers.opigno.entrypoints=web
       - 'traefik.http.routers.opigno.rule=Host(`opigno.kdock.cloud`)'
-      - traefik.http.services.opigno.loadbalancer.server.port=8080
+      - traefik.http.services.opigno.loadbalancer.server.port=10000
 
   mariadb:
     container_name: mariadb
-    image: mariadb:10.11.0
+    image: mariadb
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: opigno
     volumes:
-      - ./mariadb-data:/var/lib/mysql
+      - $PWD/mariadb-data:/var/lib/mysql
     restart: always
     networks:
       - web
     labels:
       - traefik.enable=true
       - traefik.docker.network=web
-      - traefik.http.routers.mariadb.entrypoints=web
+      - traefik.http.routers.opigno.entrypoints=web
 networks:
   web:
     external: true

@@ -31,20 +31,21 @@ RUN composer global update
 RUN ln -s /root/.composer/vendor/bin/drush /usr/local/bin/drush
 
 # Add drush command https://www.drupal.org/project/registry_rebuild
-RUN wget http://ftp.drupal.org/files/projects/registry_rebuild-7.x-2.5.tar.gz && \
-	tar xzf registry_rebuild-7.x-2.5.tar.gz && \
-	rm registry_rebuild-7.x-2.5.tar.gz && \
-	mkdir -p /root/.composer/vendor/drush/drush/commands \
-	mv registry_rebuild /root/.composer/vendor/drush/drush/commands
+RUN wget http://ftp.drupal.org/files/projects/registry_rebuild-7.x-2.5.tar.gz \
+	&& tar xzf registry_rebuild-7.x-2.5.tar.gz \
+	&& rm registry_rebuild-7.x-2.5.tar.gz \
+	&& mkdir -p /root/.composer/vendor/drush/drush/commands \
+	&& mv registry_rebuild /root/.composer/vendor/drush/drush/commands
 
 WORKDIR /var/www/html
 
 ENV OPIGNO_VERSION 3.0.4
 
-RUN curl -fSL "https://ftp.drupal.org/files/projects/opigno_lms-${OPIGNO_VERSION}-core.tar.gz" -o drupal.tar.gz \
-  && tar -xz --strip-components=1 -f drupal.tar.gz \
-  && rm drupal.tar.gz \
-  && chown -R www-data:www-data sites
+RUN curl -fSL "https://ftp.drupal.org/files/projects/opigno_lms-${OPIGNO_VERSION}.tar.gz" -o drupal.tar.gz \
+	&& tar -xz --strip-components=1 -f drupal.tar.gz \
+	&& rm drupal.tar.gz \
+	&& mkdir sites \
+	&& chown -R www-data:www-data sites
 
 # enabling better way to print certificates
 WORKDIR /var/www/html/sites/all/libraries
@@ -58,8 +59,12 @@ RUN touch /usr/local/etc/php/conf.d/memory-limit.ini && echo "memory_limit=512M"
 RUN mkdir pdf.js && cd pdf.js \
 	&& wget https://github.com/mozilla/pdf.js/releases/download/v2.16.105/pdfjs-2.16.105-dist.zip \
 	&& unzip ./pdfjs-2.16.105-dist.zip && rm ./pdfjs-2.16.105-dist.zip \
-	&& cd .. && wget https://github.com/RusticiSoftware/TinCanPHP/releases/download/TinCanPHP-1.1.1.zip \
-	&& unzip ./TinCanPHP-1.1.1.zip && rm ./TinCanPHP-1.1.1.zip && mv ./TinCanPHP-1.1.1 ./TinCanPHP
+	&& cd .. && wget https://github.com/RusticiSoftware/TinCanPHP/archive/refs/tags/1.1.1.zip \
+	&& unzip ./1.1.1.zip && rm ./1.1.1.zip && mv ./TinCanPHP-1.1.1 ./TinCanPHP
+
+EXPOSE 80
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+# CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
 
 # TODO cron run every hour
 
