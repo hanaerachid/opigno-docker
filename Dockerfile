@@ -1,4 +1,4 @@
-FROM php:8.0.23-apache
+FROM php:8.1-apache
 
 RUN a2enmod rewrite
 
@@ -39,9 +39,9 @@ RUN wget http://ftp.drupal.org/files/projects/registry_rebuild-7.x-2.5.tar.gz \
 
 WORKDIR /var/www/html
 
-ENV OPIGNO_VERSION 3.0.4
+ENV OPIGNO_VERSION 3.0.9
 
-RUN curl -fSL "https://ftp.drupal.org/files/projects/opigno_lms-${OPIGNO_VERSION}.tar.gz" -o drupal.tar.gz \
+RUN curl -fSL "https://www.opigno.org/sites/default/files/2023-03/opigno_with_dependencies-v${OPIGNO_VERSION}.tar.gz" -o drupal.tar.gz \
 	&& tar -xz --strip-components=1 -f drupal.tar.gz \
 	&& rm drupal.tar.gz \
 	&& mkdir sites \
