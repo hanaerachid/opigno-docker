@@ -37,6 +37,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: opigno
+    command: [--max-allowed-packet=67108864]
     volumes:
       - $PWD/mariadb-data:/var/lib/mysql
     restart: always
@@ -48,4 +49,3 @@ services:
       - traefik.http.routers.opigno.entrypoints=web
 networks:
   web:
-    external: true
