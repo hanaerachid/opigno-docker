@@ -41,7 +41,7 @@ ENV OPIGNO_VERSION 3.0.9
 RUN curl -fSL "https://www.opigno.org/sites/default/files/2023-03/opigno_with_dependencies-v${OPIGNO_VERSION}.tar.gz" -o drupal.tar.gz \
         && tar -xz --strip-components=1 -f drupal.tar.gz \
         && rm drupal.tar.gz \
-        && mkdir private \
+        && mkdir private update\
         && chown -R www-data:www-data /var/www/html/web
 
 WORKDIR /var/www/html/web/modules/contrib/h5p/vendor/h5p/h5p-editor
@@ -49,6 +49,12 @@ WORKDIR /var/www/html/web/modules/contrib/h5p/vendor/h5p/h5p-editor
 COPY ./h5peditor.class.php ./new.h5peditor.class.php
 
 RUN rm h5peditor.class.php && cp new.h5peditor.class.php h5peditor.class.php
+
+#Update Drupal Core
+WORKDIR /var/www/html/update
+RUN curl -fSL "https://ftp.drupal.org/files/projects/drupal-9.5.9.tar.gz" -o drupal.tar.gz \
+        && tar -xz --strip-components=1 -f drupal.tar.gz \
+        && rm drupal.tar.gz \
 
 # PHP.ini settings for Opigno to work
 RUN touch /usr/local/etc/php/conf.d/memory-limit.ini && echo "memory_limit=1024M" >> /usr/local/etc/php/conf.d/memory-limit.ini \
