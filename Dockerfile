@@ -55,6 +55,7 @@ WORKDIR /var/www/html/update
 RUN curl -fSL "https://ftp.drupal.org/files/projects/drupal-9.5.9.tar.gz" -o drupal.tar.gz \
         && tar -xz --strip-components=1 -f drupal.tar.gz \
         && rm drupal.tar.gz \
+        && cd drupal-x.y.z && cp -R core vendor /var/www/html/web && cp *.* .[a-z]* /var/www/html/web
 
 # PHP.ini settings for Opigno to work
 RUN touch /usr/local/etc/php/conf.d/memory-limit.ini && echo "memory_limit=1024M" >> /usr/local/etc/php/conf.d/memory-limit.ini \
