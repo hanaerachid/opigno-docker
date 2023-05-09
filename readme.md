@@ -5,7 +5,7 @@ _Credit to [Vabue](https://github.com/vabue/opigno-docker)_
 Simpliest method to try is to use
 
 ```bash
-docker-compose up
+sudo DOCKER_BUILDKIT=1 docker-compose up -d
 ```
 
 in the project directory.
