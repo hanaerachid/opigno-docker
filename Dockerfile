@@ -7,10 +7,8 @@ RUN apt update && apt -y install git default-mysql-client vim-tiny wget httpie u
 ADD ./000-default.conf /etc/apache2/sites-enabled
 
 # set time zone
-ENV TIME_ZONE=America/Detroit
-RUN apt-get install -y tzdata
-RUN echo '${TIME_ZONE}' > /etc/timezone
-RUN dpkg-reconfigure --frontend noninteractive tzdata
+ENV TZ=America/Detroit
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Suppressing menu to choose keyboard layout
 # COPY ./keyboard /etc/default/keyboard
@@ -46,8 +44,8 @@ ENV OPIGNO_VERSION 3.0.9
 
 RUN curl -fSL "https://www.opigno.org/sites/default/files/2023-03/opigno_with_dependencies-v${OPIGNO_VERSION}.tar.gz" -o drupal.tar.gz \
         && tar -xz --strip-components=1 -f drupal.tar.gz \
-        && rm drupal.tar.gz \
-        && mkdir private update\
+        && rm drupal.tar.gz && rm -r drush vendor *.* .[a-z]* \
+        && mkdir private update && chmod -R 777 private \
         && chown -R www-data:www-data /var/www/html/web
 
 WORKDIR /var/www/html/web/modules/contrib/h5p/vendor/h5p/h5p-editor
@@ -58,10 +56,11 @@ RUN rm h5peditor.class.php && cp new.h5peditor.class.php h5peditor.class.php
 
 #Update Drupal Core
 WORKDIR /var/www/html/update
-RUN curl -fSL "https://ftp.drupal.org/files/projects/drupal-9.5.9.tar.gz" -o drupal.tar.gz \
+ENV DRUPAL_CORE=9.5.9
+RUN curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_CORE}.tar.gz" -o drupal.tar.gz \
         && tar -xz --strip-components=1 -f drupal.tar.gz \
         && rm drupal.tar.gz \
-        && cd drupal-x.y.z && cp -R core vendor /var/www/html && cp *.* .[a-z]* /var/www/html
+        && cd drupal-${DRUPAL_CORE} && cp -R core vendor /var/www/html/web && cp *.* .[a-z]* /var/www/html/web
 
 # PHP.ini settings for Opigno to work
 RUN touch /usr/local/etc/php/conf.d/memory-limit.ini && echo "memory_limit=1024M" >> /usr/local/etc/php/conf.d/memory-limit.ini \
