@@ -9,11 +9,6 @@ ADD ./000-default.conf /etc/apache2/sites-enabled
 # Suppressing menu to choose keyboard layout
 # COPY ./keyboard /etc/default/keyboard
 
-# SET TZ
-RUN apt-get install -y tzdata
-RUN echo 'America/Detroit' > /etc/timezone
-RUN dpkg-reconfigure --frontend noninteractive tzdata
-
 # install the PHP extensions we need
 RUN apt install -y libpq-dev zlib1g-dev libpng-dev libjpeg-dev libwebp-dev libfreetype6-dev libonig-dev libzip-dev \
         && apt install -y openssl build-essential xorg libssl-dev \
@@ -46,7 +41,14 @@ ENV OPIGNO_VERSION 3.0.9
 RUN curl -fSL "https://www.opigno.org/sites/default/files/2023-03/opigno_with_dependencies-v${OPIGNO_VERSION}.tar.gz" -o drupal.tar.gz \
         && tar -xz --strip-components=1 -f drupal.tar.gz \
         && rm drupal.tar.gz \
+        && mkdir private \
         && chown -R www-data:www-data /var/www/html/web
+
+WORKDIR /var/www/html/web/modules/contrib/h5p/vendor/h5p/h5p-editor
+
+COPY ./h5peditor.class.php ./new.h5peditor.class.php
+
+RUN rm h5peditor.class.php && cp new.h5peditor.class.php h5peditor.class.php
 
 # PHP.ini settings for Opigno to work
 RUN touch /usr/local/etc/php/conf.d/memory-limit.ini && echo "memory_limit=1024M" >> /usr/local/etc/php/conf.d/memory-limit.ini \
@@ -55,27 +57,16 @@ RUN touch /usr/local/etc/php/conf.d/memory-limit.ini && echo "memory_limit=1024M
         && touch /usr/local/etc/php/conf.d/post-max-size.ini && echo "post_max_size=550M" >> /usr/local/etc/php/conf.d/post-max-size.ini \
         && touch /usr/local/etc/php/conf.d/xdebug-max-nesting-level.ini && echo "xdebug.max_nesting_level=200" >> /usr/local/etc/php/conf.d/xdebug-max-nesting-level.ini
 
-# Install pdf.js to show pdf slides and Tincan PHP
-#RUN mkdir pdf.js && cd pdf.js \
-#       && wget https://github.com/mozilla/pdf.js/releases/download/v2.16.105/pdfjs-2.16.105-dist.zip \
-#       && unzip ./pdfjs-2.16.105-dist.zip && rm ./pdfjs-2.16.105-dist.zip \
-#       && cd .. && wget https://github.com/RusticiSoftware/TinCanPHP/archive/refs/tags/1.1.1.zip \
-#       && unzip ./1.1.1.zip && rm ./1.1.1.zip && mv ./TinCanPHP-1.1.1 ./TinCanPHP
-
 WORKDIR /var/www/html/web/sites/default
 
-RUN cp default.settings.php settings.php && chmod 776 settings.php\
+COPY ./custom.settings.php ./settings.php
+
+RUN chmod 776 settings.php \
         && mkdir -p files/media-icons/generic && chmod -R 777 files
+
+ENV DRUPAL_TRUSTED_HOST="www\.example\.com"
 
 EXPOSE 80
 CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
 
-#TODO cron run every hour
-
-
-#TODO add entrypoint.sh to my folder
-#COPY entrypoint.sh /entrypoint.sh
-
-#RUN chmod 755 /*.sh
-#ENTRYPOINT ["/entrypoint.sh"]
-#CMD ["apache2-foreground"]
+#ENTRYPOINT ["echo", "chmod"]
