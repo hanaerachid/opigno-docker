@@ -6,6 +6,12 @@ RUN apt update && apt -y install git default-mysql-client vim-tiny wget httpie u
 
 ADD ./000-default.conf /etc/apache2/sites-enabled
 
+# set time zone
+ENV TIME_ZONE=America/Detroit
+RUN apt-get install -y tzdata
+RUN echo '${TIME_ZONE}' > /etc/timezone
+RUN dpkg-reconfigure --frontend noninteractive tzdata
+
 # Suppressing menu to choose keyboard layout
 # COPY ./keyboard /etc/default/keyboard
 
