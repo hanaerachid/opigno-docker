@@ -42,6 +42,7 @@ WORKDIR /var/www/html
 
 ENV OPIGNO_VERSION 3.0.9
 
+#Downloads Opigno and sets stage for core update
 RUN curl -fSL "https://www.opigno.org/sites/default/files/2023-03/opigno_with_dependencies-v${OPIGNO_VERSION}.tar.gz" -o drupal.tar.gz \
         && tar -xz --strip-components=1 -f drupal.tar.gz \
         && rm drupal.tar.gz && rm -r drush vendor *.* .[a-z]* \
@@ -50,6 +51,7 @@ RUN curl -fSL "https://www.opigno.org/sites/default/files/2023-03/opigno_with_de
 
 WORKDIR /var/www/html/web/modules/contrib/h5p/vendor/h5p/h5p-editor
 
+#Fixes PHP8.* compatibility
 COPY ./h5peditor.class.php ./new.h5peditor.class.php
 
 RUN rm h5peditor.class.php && cp new.h5peditor.class.php h5peditor.class.php
@@ -71,6 +73,7 @@ RUN touch /usr/local/etc/php/conf.d/memory-limit.ini && echo "memory_limit=1024M
 
 WORKDIR /var/www/html/web/sites/default
 
+#Custom settings to set both a private directory and turn trusted host patterns into an ENV variable
 COPY ./custom.settings.php ./settings.php
 
 RUN chmod 776 settings.php \
