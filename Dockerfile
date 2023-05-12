@@ -44,7 +44,7 @@ WORKDIR /var/www/html/web/modules/contrib/h5p/vendor/h5p/h5p-editor
 COPY ./h5peditor.class.php ./h5peditor.class.php
 
 # Enable web based string editor
-composer require 'drupal/stringoverrides:^1.8'
+RUN composer require 'drupal/stringoverrides:^1.8'
 
 # Update Drupal core to highest allowed by Opigno
 WORKDIR /var/www/html
