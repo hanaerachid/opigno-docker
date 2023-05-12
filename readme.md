@@ -33,7 +33,7 @@ For more information on string overrides, visit: https://www.drupal.org/project/
 
 TO ENABLE SSL & 443:
 
-This requires modifications to to the Dockerfile that you must do for yourself. I personally use a Cloudflare tunnel so these steps are not needed for me as the tunnel takes care of the SSL configuration for me. If you would like to use that option, check out this video: [NetworkChuck: Cloudflare Tunnels] (https://www.youtube.com%2Fwatch%3Fv%3Dey4u7OUAF3c&usg=AOvVaw3PphOIhvNL11fhIeI2GwHW)
+This requires modifications to to the Dockerfile that you must do for yourself. I personally use a Cloudflare tunnel so these steps are not needed for me as the tunnel takes care of the SSL configuration for me. If you would like to use that option, check out this video: [NetworkChuck: Cloudflare Tunnels](https://www.youtube.com%2Fwatch%3Fv%3Dey4u7OUAF3c&usg=AOvVaw3PphOIhvNL11fhIeI2GwHW)
 
 Do it yourself instructions (as dictated by ChatGPT! Pretty neat!):
 
