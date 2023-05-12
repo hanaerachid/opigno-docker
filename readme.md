@@ -31,7 +31,7 @@ The String Overrides module has also be added so you can customize the text on y
 
 To enable, visit (your.url.com)/admin/modules and install it from the list. Update your other modules while youre there.
 
-To use: visit (your.url.com)/admin/settings/stringoverrides or (your.url.com)/admin/config/regional/stringoverrides and fill in the strings you'd like to replace.
+To use: visit (your.url.com)/admin/settings/stringoverrides or (your.url.com)/admin/config/regional/stringoverrides and fill in the strings you'd like to replace. Dont forget to go back to the main configuration page and clear the website's cache.
 
 For more information on string overrides, visit: https://www.drupal.org/project/stringoverrides
 
