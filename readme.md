@@ -27,3 +27,8 @@ docker exec -it opigno chmod 644 sites/default/settings.php
 ```
 
 Note that when checking your status report, you will get an error/warning to update the drupal core. DO NOT attempt as that breaks certain Opigno Modules, such as the calendar. The Dockerfile already runs a command during build that updates the core to the highest possible without breaking the site.
+
+ADDED FEATURE & CUSTOMIZATION:
+The String Overrides module has also be added so you can customize the text on your site directly from the web browser. To use: visit (your.url.com)/admin/settings/stringoverrides or (your.url.com)/admin/config/regional/stringoverrides and fill in the strings you'd like to replace.
+
+For more information on string overrides, visit: https://www.drupal.org/project/stringoverrides
