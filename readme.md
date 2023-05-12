@@ -30,3 +30,50 @@ ADDED FEATURE & CUSTOMIZATION:
 The String Overrides module has also be added so you can customize the text on your site directly from the web browser. To use: visit (your.url.com)/admin/settings/stringoverrides or (your.url.com)/admin/config/regional/stringoverrides and fill in the strings you'd like to replace.
 
 For more information on string overrides, visit: https://www.drupal.org/project/stringoverrides
+
+TO ENABLE SSL & 443:
+
+This requires modifications to to the Dockerfile that you must do for yourself. I personally use a Cloudflare tunnel so these steps are not needed for me as the tunnel takes care of the SSL configuration for me. If you would like to use that option, check out this video: [NetworkChuck: Cloudflare Tunnels] (https://www.youtube.com%2Fwatch%3Fv%3Dey4u7OUAF3c&usg=AOvVaw3PphOIhvNL11fhIeI2GwHW)
+
+Do it yourself instructions (as dictated by ChatGPT! Pretty neat!):
+
+On the commandline of your local machine: use Certbot to generate SSL certificates:
+
+```bash
+certbot certonly --standalone -d example.com -d www.example.com
+```
+
+Replace "example.com" with your domain name.
+
+Once you have the SSL certificates, copy them into the Docker container by adding the following lines to the Dockerfile:
+
+'''bash
+COPY --chown=www-data:www-data /path/to/cert/fullchain.pem /etc/ssl/certs/opigno.crt
+COPY --chown=www-data:www-data /path/to/cert/privkey.pem /etc/ssl/private/opigno.key
+```
+
+Replace "/path/to/cert" with the path to your SSL certificates.
+
+Next, we need to modify the Apache virtual host configuration to use SSL. Add the following lines to the end of the "opigno.conf" file:
+
+```bash
+SSLEngine on
+SSLCertificateFile /etc/ssl/certs/opigno.crt
+SSLCertificateKeyFile /etc/ssl/private/opigno.key
+```
+
+We also need to redirect traffic from port 80 to port 443. Add the following lines to the "opigno.conf" file, right after the "DocumentRoot" line:
+
+```bash
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+```
+
+Finally, we need to expose port 443 in the Docker container. Add the following line to the Dockerfile, right after the "EXPOSE 80" line:
+
+```bash
+EXPOSE 443
+```
+
+Build and run the Docker container as usual. When you access the Opigno site, it should automatically redirect you to the SSL version of the site (https://).
