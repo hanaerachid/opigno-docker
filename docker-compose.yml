@@ -1,0 +1,35 @@
+version: "3.3"
+
+networks:
+  web:
+
+services:
+  opigno:
+    container_name: opigno
+    hostname: opigno
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      TRUSTED_HOSTS: 'www\.example\.com'
+      SITE_URL: 'https://www.example.com'
+    depends_on:
+      - mariadb
+    restart: always
+    networks:
+      - web
+
+  mariadb:
+    container_name: mariadb
+    image: mariadb:latest
+    environment:
+      - MYSQL_DATABASE=CustomDB_name
+      - MYSQL_USER=CustomUserName
+      - MYSQL_PASSWORD=YourNONrootPassword
+      - MYSQL_ROOT_PASSWORD=YourRootPassword
+    volumes:
+      - ./data:/var/lib/mysql
+    command: [--max-allowed-packet=67108864]
+    restart: always
+    networks:
+      - web
