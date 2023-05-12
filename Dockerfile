@@ -22,14 +22,15 @@ RUN pecl install apcu && \
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+ENV COMPOSER_ALLOW_SUPERUSER 1
 
-# Download and install Opigno LMS
+# Download and install Opigno LMS and update modules and core to highest supported version
 WORKDIR /var/www/html
 RUN curl -fSL "https://www.opigno.org/sites/default/files/2023-03/opigno_with_dependencies-v3.0.9.tar.gz" -o drupal.tar.gz \
     && tar -xz --strip-components=1 -f drupal.tar.gz \
     && rm drupal.tar.gz \
     && mkdir private update && chmod -R 775 private
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html && composer update
 
 # sets up settings.php
 WORKDIR /var/www/html/web/sites/default
@@ -43,12 +44,10 @@ ENV TRUSTED_HOSTS="www\.example\.com"
 WORKDIR /var/www/html/web/modules/contrib/h5p/vendor/h5p/h5p-editor
 COPY ./h5peditor.class.php ./h5peditor.class.php
 
-# Enable web based string editor
-RUN composer require 'drupal/stringoverrides:^1.8'
-
-# Update Drupal core to highest allowed by Opigno
-WORKDIR /var/www/html
-RUN composer update drupal/core-recommended --with-all-dependencies
+# Enable web based string editor. Must be manually installed because composer cannot find the most recent version
+WORKDIR /var/www/html/web/modules/contrib
+RUN curl -fSL "https://ftp.drupal.org/files/projects/stringoverrides-8.x-1.8.tar.gz" -o string.tar.gz \
+    && tar -xz -f string.tar.gz && rm string.tar.gz
 
 # Set recommended PHP settings for Opigno LMS
 COPY opigno-php.ini /usr/local/etc/php/conf.d/opigno-php.ini
