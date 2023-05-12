@@ -21,7 +21,7 @@ IMPORTANT: when entering your databse information, you will need to select advan
 Once your site is running and you are able to navigate the site run this command to change the settings.php permissions:
 
 ```bash
-docker exec -it opigno chmod 644 sites/default/settings.php
+docker exec -it opigno chmod 644 /var/www/html/web/sites/default/settings.php
 ```
 
 Note that when checking your status report, you will get an error/warning to update the drupal core. DO NOT attempt as that breaks certain Opigno Modules, such as the calendar. The Dockerfile already runs a command during build that updates the core to the highest possible without breaking the site.
