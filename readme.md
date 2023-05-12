@@ -74,10 +74,6 @@ RewriteCond %{HTTPS} off
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
 ```
 
-Finally, we need to expose port 443 in the Docker container. Add the following line to the Dockerfile, right after the "EXPOSE 80" line:
-
-```bash
-EXPOSE 443
-```
+Note that ports 80 and 443 are exposed by the image/container by default so they do not need to be added to the Dockerfile
 
 Build and run the Docker container as usual. When you access the Opigno site, it should automatically redirect you to the SSL version of the site (https://).
