@@ -1,7 +1,5 @@
 # Basic Docker distribution Opigno 3.0.9
 
-_Credit to [Vabue](https://github.com/vabue/opigno-docker)_
-
 The dockerfile and supporting files were almost entirely generated using ChatGPT and providing feedback. ChatGPT would often change previous commands while updating and refining current commands being debugged. The best of each command was kept.
 
 To install run:
