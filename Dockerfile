@@ -64,3 +64,6 @@ RUN ln -s /etc/apache2/sites-available/opigno.conf /etc/apache2/sites-enabled/op
 
 # Start Apache server
 CMD ["apache2-foreground"]
+
+# Set the tag for this Docker image
+LABEL opigno_version="3.0.9"
