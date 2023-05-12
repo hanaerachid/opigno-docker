@@ -47,7 +47,7 @@ Replace "example.com" with your domain name.
 
 Once you have the SSL certificates, copy them into the Docker container by adding the following lines to the Dockerfile:
 
-'''bash
+```bash
 COPY --chown=www-data:www-data /path/to/cert/fullchain.pem /etc/ssl/certs/opigno.crt
 COPY --chown=www-data:www-data /path/to/cert/privkey.pem /etc/ssl/private/opigno.key
 ```
