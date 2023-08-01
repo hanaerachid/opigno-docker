@@ -1,4 +1,4 @@
-# Opigno 3.0.9 Dockerfile
+# Opigno Dockerfile
 FROM php:8.1-apache
 
 # Install required packages
@@ -10,7 +10,8 @@ RUN apt update && apt install -y \
     libzip-dev \
     zip \
     unzip \
-    cron
+    cron \
+    git
 
 # Install PHP extensions
 RUN docker-php-ext-configure intl && \
@@ -27,9 +28,7 @@ ENV COMPOSER_ALLOW_SUPERUSER 1
 
 # Download and install Opigno LMS and update modules and core to highest supported version
 WORKDIR /var/www/html
-RUN curl -fSL "https://www.opigno.org/sites/default/files/2023-03/opigno_with_dependencies-v3.0.9.tar.gz" -o drupal.tar.gz \
-    && tar -xz --strip-components=1 -f drupal.tar.gz \
-    && rm drupal.tar.gz \
+RUN composer create-project opigno/opigno-composer /var/www/html \
     && mkdir private update && chmod -R 775 private
 RUN chown -R www-data:www-data /var/www/html && composer update
 
@@ -41,9 +40,10 @@ RUN cp default.settings.php settings.php \
     && echo "\$settings['trusted_host_patterns'] = array('^'. getenv('TRUSTED_HOSTS') .'$',);" >> settings.php
 ENV TRUSTED_HOSTS="www\.example\.com"
 
-# Fixes php8 compatibility issue
-WORKDIR /var/www/html/web/modules/contrib/h5p/vendor/h5p/h5p-editor
-COPY ./h5peditor.class.php ./h5peditor.class.php
+# Uncomment if using a reverse proxy
+#RUN echo "\$settings['reverse_proxy'] = TRUE;" >> settings.php \
+#    && echo "\$settings['reverse_proxy_addresses'] = ['172.21.0.0/24', '173.245.48.0/20', '103.21.244.0/22', '103.22.200.0/22', '103.31.4.0/22', '141.101.64.0/18', '108.162.192.0/18', '190.93.240.0/20', '188.114.96.0/20', '197.234.240.0/22', '198.41.128.0/17', '162.158.0.0/15', '104.16.0.0/13', '104.24.0.0/14', '172.64.0.0/13', '131.0.72.0/22'];" >> settings.php \
+#    && echo "\$settings['reverse_proxy_trusted_headers'] = \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_FOR | \Symfony\Component\HttpFoundation\Request::HEADER_FORWARDED;" >> settings.php
 
 # Enable web based string editor. Must be manually installed because composer cannot find the most recent version
 WORKDIR /var/www/html/web/modules/contrib
@@ -62,8 +62,8 @@ COPY opigno.conf /etc/apache2/sites-available/opigno.conf
 RUN ln -s /etc/apache2/sites-available/opigno.conf /etc/apache2/sites-enabled/opigno.conf && \
     rm /etc/apache2/sites-enabled/000-default.conf && a2enmod rewrite
 
+#Uncomment if using a reverse proxy
+#RUN a2enmod remoteip && a2enmod headers && echo "ServerName 127.0.0.1" >> /etc/apache2/apache2.conf
+
 # Start Apache server
 CMD ["apache2-foreground"]
-
-# Set the tag for this Docker image
-LABEL opigno_version="3.0.9"
