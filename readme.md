@@ -1,4 +1,4 @@
-# Basic Docker distribution Opigno 3.0.9
+# Basic Docker distribution Opigno
 
 The dockerfile and supporting files were almost entirely generated using ChatGPT and providing feedback. ChatGPT would often change previous commands while updating and refining current commands being debugged. The best of each command was kept.
 
@@ -18,7 +18,7 @@ Once the container is up and running, navigate to the webpage (your.url.com) and
 
 IMPORTANT: when entering your databse information, you will need to select advanced options and change Host from localhost to mariadb. Because this is using docker networking, the container name can be specified and will connect.
 
-Once your site is running and you are able to navigate the site run this command to change the settings.php permissions:
+Once your site is running and you are able to navigate the site, run this command to change the settings.php permissions:
 
 ```bash
 docker exec -it opigno chmod 644 /var/www/html/web/sites/default/settings.php
@@ -77,3 +77,7 @@ RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
 Note that ports 80 and 443 are exposed by the image/container by default so they do not need to be added to the Dockerfile
 
 Build and run the Docker container as usual. When you access the Opigno site, it should automatically redirect you to the SSL version of the site (https://).
+
+Reverse Proxy
+
+The Dockerfile has configuration for using a reverse proxy (like traefik). They are commented out by default. Uncomment the before building to enable.
