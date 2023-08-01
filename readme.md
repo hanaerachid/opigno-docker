@@ -26,7 +26,8 @@ docker exec -it opigno chmod 644 /var/www/html/web/sites/default/settings.php
 
 Note that when checking your status report, you will get an error/warning to update the drupal core. DO NOT attempt as that breaks certain Opigno Modules, such as the calendar. The Dockerfile already runs a command during build that updates the core to the highest possible without breaking the site.
 
-ADDED FEATURE & CUSTOMIZATION:
+## Additional features and customization:
+
 The String Overrides module has also be added so you can customize the text on your site directly from the web browser. 
 
 To enable, visit (your.url.com)/admin/modules and install it from the list. Update your other modules while youre there.
@@ -35,9 +36,9 @@ To use: visit (your.url.com)/admin/settings/stringoverrides or (your.url.com)/ad
 
 For more information on string overrides, visit: https://www.drupal.org/project/stringoverrides
 
-TO ENABLE SSL & 443:
+### TO ENABLE SSL & 443:
 
-This requires modifications to to the Dockerfile that you must do for yourself. I personally use a Cloudflare tunnel so these steps are not needed for me as the tunnel takes care of the SSL configuration for me. If you would like to use that option, check out this video: [NetworkChuck: Cloudflare Tunnels](https://www.youtube.com%2Fwatch%3Fv%3Dey4u7OUAF3c&usg=AOvVaw3PphOIhvNL11fhIeI2GwHW)
+This requires modifications to to the Dockerfile that you must do for yourself. I personally use both a reverse proxy and a Cloudflare tunnel, so these steps are not needed for me as those care of the SSL configuration for me. If you would like to use that option, check out this video: [NetworkChuck: Cloudflare Tunnels](https://www.youtube.com%2Fwatch%3Fv%3Dey4u7OUAF3c&usg=AOvVaw3PphOIhvNL11fhIeI2GwHW)
 
 Do it yourself instructions (as dictated by ChatGPT! Pretty neat!):
 
@@ -78,6 +79,6 @@ Note that ports 80 and 443 are exposed by the image/container by default so they
 
 Build and run the Docker container as usual. When you access the Opigno site, it should automatically redirect you to the SSL version of the site (https://).
 
-Reverse Proxy
+### Reverse Proxy
 
 The Dockerfile has configuration for using a reverse proxy (like traefik). They are commented out by default. Uncomment the before building to enable.
