@@ -33,7 +33,7 @@ RUN composer create-project opigno/opigno-composer /var/www/html \
 RUN chown -R www-data:www-data /var/www/html && composer update
 
 # Recommended cron settings for optimization
-ENV SITE_URL=http://www.example.com
+ENV SITE_URL="http://www.example.com"
 RUN echo "*/5 * * * * wget -O - -q -t 1 ${SITE_URL}" >> crontab
 
 # sets up settings.php
