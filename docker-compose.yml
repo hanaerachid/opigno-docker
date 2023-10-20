@@ -10,6 +10,7 @@ services:
     build: .
     ports:
       - "8080:80"
+      - "443:443"
     environment:
       TRUSTED_HOSTS: 'www\.example\.com'
       SITE_URL: 'https://www.example.com'
