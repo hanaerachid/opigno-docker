@@ -1,6 +1,8 @@
-# Basic Docker distribution Opigno
+# Enhanced docker distribution of Opigno LMS
 
-The dockerfile and supporting files were almost entirely generated using ChatGPT and providing feedback. ChatGPT would often change previous commands while updating and refining current commands being debugged. The best of each command was kept.
+This project started as before Opigno created thier own docker image. However, their current image does not include apache webserver.
+
+This image includes apache as well as the ability to easily load your own custom settings through a custom.settings.php file (see example docker compose and custom.settings.php file)
 
 To install run:
 
@@ -10,9 +12,9 @@ sudo DOCKER_BUILDKIT=1 docker-compose up -d
 
 in the project directory.
 
-In the docker-compose file, besure to update TRUSTED_HOSTS and SITE_URL. They should look similar, but keep the formatting. If you plan on running locally without a custom URL, change to the machines IP and Port, paying attention to if you are using HTTP or HTTPS. (I.E: 192.168.1.10:8080)
+In the docker-compose file, besure to update the MariaDB database, user names, and passwords.
 
-Further, update the MariaDB database, user names, and passwords.
+You can choose to not use custom.settings.php and the site will run on local ip and localhost. However, if you plan to use a custom domain and/or reverse proxy, be sure to use and customize the settings found there. Feel free to also add your own settings.
 
 Once the container is up and running, navigate to the webpage (your.url.com) and star the opigno installation process.
 
@@ -24,7 +26,7 @@ Once your site is running and you are able to navigate the site, run this comman
 docker exec -it opigno chmod 644 /var/www/html/web/sites/default/settings.php
 ```
 
-Note that when checking your status report, you will get an error/warning to update the drupal core. DO NOT attempt as that breaks certain Opigno Modules, such as the calendar. The Dockerfile already runs a command during build that updates the core to the highest possible without breaking the site.
+Note DO NOT update the base calendar module from Drupal, as it is not compatible currently with the Opigno calendar and will break it.
 
 ## Additional features and customization:
 
@@ -39,8 +41,6 @@ For more information on string overrides, visit: https://www.drupal.org/project/
 ### TO ENABLE SSL & 443:
 
 This requires modifications to to the Dockerfile that you must do for yourself. I personally use both a reverse proxy and a Cloudflare tunnel, so these steps are not needed for me as those care of the SSL configuration for me. If you would like to use that option, check out this video: [NetworkChuck: Cloudflare Tunnels](https://www.youtube.com%2Fwatch%3Fv%3Dey4u7OUAF3c&usg=AOvVaw3PphOIhvNL11fhIeI2GwHW)
-
-Do it yourself instructions (as dictated by ChatGPT! Pretty neat!):
 
 On the commandline of your local machine: use Certbot to generate SSL certificates:
 
@@ -81,4 +81,4 @@ Build and run the Docker container as usual. When you access the Opigno site, it
 
 ### Reverse Proxy
 
-The Dockerfile has configuration for using a reverse proxy (like traefik). They are commented out by default. Uncomment the before building to enable.
+Be sure to use the settings found in custom.settings.php and add your proxy ips. Default cloudflare proxy ips are currently listed.
