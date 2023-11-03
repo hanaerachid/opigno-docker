@@ -1,69 +1,47 @@
-# Opigno Dockerfile
-FROM php:8.2-apache
+# Opigno 3.1.0 Dockerfile
+FROM php:8.2-apache-bookworm
 
-# Install required packages
-RUN apt update && apt install -y \
-    libicu-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libxml2-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    cron \
-    git
+# Set environment variables for Composer and site URL
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Install PHP extensions
-RUN docker-php-ext-configure intl && \
-    docker-php-ext-configure gd --with-jpeg && \
-    docker-php-ext-install intl pdo_mysql gd zip opcache soap bcmath
+# Install required packages and PHP extensions
+RUN apt-get update && apt-get install -y libicu-dev libpng-dev libjpeg-dev libxml2-dev libzip-dev zip unzip cron git \
+ && docker-php-ext-configure intl \
+ && docker-php-ext-configure gd --with-jpeg \
+ && docker-php-ext-install intl pdo_mysql gd zip opcache soap bcmath \
+ && pecl install apcu && docker-php-ext-enable apcu \
+ && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install APCu
-RUN pecl install apcu && \
-    docker-php-ext-enable apcu
-
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-ENV COMPOSER_ALLOW_SUPERUSER 1
-
-# Download and install Opigno LMS and update modules and core to highest supported version
+# Download and install Opigno LMS and set proper permissions
 WORKDIR /var/www/html
-RUN composer create-project opigno/opigno-composer /var/www/html \
-    && mkdir private update && chmod -R 775 private
-RUN chown -R www-data:www-data /var/www/html && composer update
+RUN composer create-project opigno/opigno-composer . \
+    && mkdir private update \
+    && chmod -R 775 private \
+    && chown -R www-data:www-data .
 
-# Recommended cron settings for optimization
-ENV SITE_URL="http://www.example.com"
-RUN echo "*/5 * * * * wget -O - -q -t 1 ${SITE_URL}" >> crontab
-
-# sets up settings.php
+# Configure settings.php
 WORKDIR /var/www/html/web/sites/default
-RUN cp default.settings.php settings.php \
-    && chmod 776 settings.php && mkdir -p files/media-icons/generic && chmod -R 777 files \
-    && echo "\$settings['file_public_base_url'] = '${SITE_URL}/sites/default/files';" >> settings.php \
-    && echo "\$settings['file_private_path'] = '/var/www/html/private';" >> settings.php \
-    && echo "\$settings['trusted_host_patterns'] = array('^'. getenv('TRUSTED_HOSTS') .'$',);" >> settings.php
-ENV TRUSTED_HOSTS="www\.example\.com"
-
-# Uncomment if using a reverse proxy
-#ENV PROXYIP="127.0.0.0/24"
-#RUN a2enmod remoteip && a2enmod headers && echo "ServerName 127.0.0.1" >> /etc/apache2/apache2.conf \
-#    && echo "\$settings['reverse_proxy'] = TRUE;" >> settings.php \
-#    && echo "\$settings['reverse_proxy_addresses'] = ['${PROXYIP}', '173.245.48.0/20', '103.21.244.0/22', '103.22.200.0/22', '103.31.4.0/22', '141.101.64.0/18', '108.162.192.0/18', '190.93.240.0/20', '188.114.96.0/20', '197.234.240.0/22', '198.41.128.0/17', '162.158.0.0/15', '104.16.0.0/13', '104.24.0.0/14', '172.64.0.0/13', '131.0.72.0/22'];" >> settings.php \
-#    && echo "\$settings['reverse_proxy_trusted_headers'] = \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_FOR | \Symfony\Component\HttpFoundation\Request::HEADER_FORWARDED;" >> settings.php
+RUN cp default.settings.php settings.php && chmod 776 settings.php \
+    && mkdir -p files/media-icons/generic && chmod -R 777 files && chown -R www-data:www-data files \
+    && echo "if (file_exists('/var/www/html/web/sites/custom.settings.php')) {include '/var/www/html/web/sites/custom.settings.php';}" >> settings.php
 
 # Enable web based string editor. Must be manually installed because composer cannot find the most recent version
 WORKDIR /var/www/html/web/modules/contrib
 RUN curl -fSL "https://ftp.drupal.org/files/projects/stringoverrides-8.x-1.8.tar.gz" -o string.tar.gz \
-    && tar -xz -f string.tar.gz && rm string.tar.gz
+    && tar -xz -f string.tar.gz && rm string.tar.gz && chown -R www-data:www-data stringoverrides
 
 # Set recommended PHP settings for Opigno LMS
-COPY opigno-php.ini /usr/local/etc/php/conf.d/opigno-php.ini
+COPY opigno-php.ini /usr/local/etc/php/conf.d/
 
 # Set up Apache virtual host
-COPY opigno.conf /etc/apache2/sites-available/opigno.conf
-RUN ln -s /etc/apache2/sites-available/opigno.conf /etc/apache2/sites-enabled/opigno.conf && \
-    rm /etc/apache2/sites-enabled/000-default.conf && a2enmod rewrite
+COPY opigno.conf /etc/apache2/sites-available/
+RUN ln -s /etc/apache2/sites-available/opigno.conf /etc/apache2/sites-enabled/opigno.conf && a2ensite opigno && a2enmod rewrite remoteip headers \
+    && rm /etc/apache2/sites-enabled/000-default.conf && echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Start Apache server
+# Start Apache server in the foreground
 CMD ["apache2-foreground"]
+
+# Set the tag for this Docker image
+LABEL opigno_version="3.1.0"
