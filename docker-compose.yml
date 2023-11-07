@@ -1,8 +1,5 @@
 version: "3.3"
 
-networks:
-  web:
-
 services:
   opigno:
     container_name: opigno
@@ -29,7 +26,10 @@ services:
       - MYSQL_ROOT_PASSWORD=YourRootPassword
     volumes:
       - ./data:/var/lib/mysql
-    command: [--max-allowed-packet=67108864]
+    command: [ --max-allowed-packet=67108864 ]
     restart: always
     networks:
       - web
+
+networks:
+  web:
