@@ -1,6 +1,6 @@
 # Enhanced docker distribution of Opigno LMS
 
-This project started as before Opigno created thier own docker image. However, their current image does not include apache webserver.
+This project started before Opigno created thier own docker image. However, their current image does not include apache webserver.
 
 This image includes apache as well as the ability to easily load your own custom settings through a custom.settings.php file (see example docker compose and custom.settings.php file)
 
