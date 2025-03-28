@@ -1,6 +1,6 @@
 # Enhanced docker distribution of Opigno LMS
 
-This project started as before Opigno created thier own docker image. However, their current image does not include apache webserver.
+This project started before Opigno created thier own docker image. However, their current image does not include apache webserver.
 
 This image includes apache as well as the ability to easily load your own custom settings through a custom.settings.php file (see example docker compose and custom.settings.php file)
 
@@ -16,7 +16,7 @@ In the docker-compose file, besure to update the MariaDB database, user names, a
 
 You can choose to not use custom.settings.php and the site will run on local ip and localhost. However, if you plan to use a custom domain and/or reverse proxy, be sure to use and customize the settings found there. Feel free to also add your own settings.
 
-Once the container is up and running, navigate to the webpage (your.url.com) and star the opigno installation process.
+Once the container is up and running, navigate to the webpage (your.url.com) and start the opigno installation process.
 
 IMPORTANT: when entering your databse information, you will need to select advanced options and change Host from localhost to mariadb. Because this is using docker networking, the container name can be specified and will connect.
 
